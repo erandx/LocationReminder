@@ -1,0 +1,9 @@
+<resources>
+<!--    Before you run your application, you need a Google Maps API key.
+
+        Here are the directions on how to set up your Google API key
+        https://developers.google.com/maps/documentation/android/start#get-key
+-->
+
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBGR8TpMdM3Vgov9eJmd9469X6kOvRcqOw</string>
+</resources>
