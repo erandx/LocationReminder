@@ -11,9 +11,9 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/map_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <!--TODO: Add the map fragment for the user to select the location-->
 
         <fragment
             android:id="@+id/map"
@@ -21,6 +21,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context=".locationreminders.RemindersActivity"/>
+
+        <Button
+            android:id="@+id/save_location_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save"
+            android:background="@color/colorAccent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_margin="@dimen/padding_large"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
