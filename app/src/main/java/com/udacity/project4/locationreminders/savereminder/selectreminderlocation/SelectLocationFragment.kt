@@ -47,10 +47,8 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private lateinit var binding: FragmentSelectLocationBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var map: GoogleMap
-//    private lateinit var poi: PointOfInterest
 
     private val runningQorLater = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
-
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -72,7 +70,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
-
+        
         return binding.root
     }
 
@@ -81,13 +79,13 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
          *  send back the selected location details to the view model
          *  and navigate back to the previous fragment to save the reminder and add the geofence
          */
-        val latLng = poi.latLng
-        _viewModel.latitude.value = latLng.latitude
-        _viewModel.longitude.value = latLng.longitude
-        _viewModel.selectedPOI.value = poi
-        _viewModel.reminderSelectedLocationStr.value = poi.name
-        _viewModel.navigationCommand.postValue(NavigationCommand.Back)
-    }
+            val latLng = poi.latLng
+            _viewModel.latitude.value = latLng.latitude
+            _viewModel.longitude.value = latLng.longitude
+            _viewModel.selectedPOI.value = poi
+            _viewModel.reminderSelectedLocationStr.value = poi.name
+            _viewModel.navigationCommand.postValue(NavigationCommand.Back)
+        }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.map_options, menu)
@@ -102,13 +100,14 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             fusedLocationProviderClient.lastLocation.addOnSuccessListener(requireActivity()) { location ->
                 if (location != null) {
                     val userLatLng = LatLng(location.latitude, location.longitude)
-                    val zoomLevel = 13f
+                    val zoomLevel = 15f
                     map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, zoomLevel))
                 }
             }
-            map.moveCamera(CameraUpdateFactory.zoomIn())
         } else {
             _viewModel.showErrorMessage.postValue(getString(R.string.err_select_location))
+            ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            REQUEST_TURN_LOCATION_ON)
         }
     }
 
@@ -138,16 +137,19 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
         requestForegroundAndBackgroundPermissions()
 
-        setPoiClick(map)
-        setMapStyle(map)
 
         enableLocation()
+
+        setPoiClick(map)
+
+        setMapStyle(map)
     }
 
-    //POI (Point of Interest) that clicks and sets a Pin dispaying POI name.
+    //POI (Point of Interest) that clicks and sets a Pin displaying POI name.
     private fun setPoiClick(map: GoogleMap) {
         map.setOnPoiClickListener { poi ->
             binding.saveLocationButton.visibility = View.VISIBLE
+
             val poiMarket = map.addMarker(
                     MarkerOptions().position(poi.latLng)
                             .title(poi.name)
@@ -222,6 +224,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     //We check if the user has their Location Device Enabled, if not we ask to turn it ON
     //using the Location request
+    @SuppressLint("MissingPermission")
     private fun checkDeviceLocationSettings(resolve: Boolean = true) {
         val locationRequest = LocationRequest.create().apply {
             priority = LocationRequest.PRIORITY_LOW_POWER
