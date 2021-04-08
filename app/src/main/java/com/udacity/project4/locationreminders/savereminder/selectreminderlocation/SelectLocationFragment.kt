@@ -46,6 +46,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     override val _viewModel: SaveReminderViewModel by inject()
     private lateinit var binding: FragmentSelectLocationBinding
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+
     private lateinit var map: GoogleMap
 
     private val runningQorLater = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
@@ -65,12 +66,12 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
          * SupportMapFragment is a way to get GoogleMap into the Application
          * When we reference a fragment inside an Activity we use supportFragmentManger
          * When we reference a fragment inside a parent Fragment we use childFragmentManager
-         * getMapAsync is also call to prepare Google Map. When this finishes the onMapReady is called
+         * getMapAsync is also called to prepare Google Map. When this finishes the onMapReady is called
          */
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
-        
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity!!)
+
         return binding.root
     }
 
@@ -79,13 +80,13 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
          *  send back the selected location details to the view model
          *  and navigate back to the previous fragment to save the reminder and add the geofence
          */
-            val latLng = poi.latLng
-            _viewModel.latitude.value = latLng.latitude
-            _viewModel.longitude.value = latLng.longitude
-            _viewModel.selectedPOI.value = poi
-            _viewModel.reminderSelectedLocationStr.value = poi.name
-            _viewModel.navigationCommand.postValue(NavigationCommand.Back)
-        }
+        val latLng = poi.latLng
+        _viewModel.latitude.value = latLng.latitude
+        _viewModel.longitude.value = latLng.longitude
+        _viewModel.selectedPOI.value = poi
+        _viewModel.reminderSelectedLocationStr.value = poi.name
+        _viewModel.navigationCommand.postValue(NavigationCommand.Back)
+    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.map_options, menu)
@@ -97,7 +98,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         if (foregroundAndBackgroundLocationPermissionApproved()) {
             requestForegroundAndBackgroundPermissions()
             map.isMyLocationEnabled = true
-            fusedLocationProviderClient.lastLocation.addOnSuccessListener(requireActivity()) { location ->
+            fusedLocationProviderClient.lastLocation.addOnSuccessListener(activity!!) { location ->
                 if (location != null) {
                     val userLatLng = LatLng(location.latitude, location.longitude)
                     val zoomLevel = 15f
@@ -107,7 +108,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         } else {
             _viewModel.showErrorMessage.postValue(getString(R.string.err_select_location))
             ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-            REQUEST_TURN_LOCATION_ON)
+                    REQUEST_TURN_LOCATION_ON)
         }
     }
 
@@ -136,7 +137,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         map = googleMap
 
         requestForegroundAndBackgroundPermissions()
-
 
         enableLocation()
 
@@ -283,6 +283,13 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                     }.show()
         } else {
             enableLocation()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == REQUEST_TURN_LOCATION_ON) {
+            checkDeviceLocationSettings(false)
         }
     }
 }

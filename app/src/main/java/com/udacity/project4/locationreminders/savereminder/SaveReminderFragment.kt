@@ -50,6 +50,8 @@ class SaveReminderFragment : BaseFragment() {
 
         setDisplayHomeAsUpEnabled(true)
 
+        geofenceClient = LocationServices.getGeofencingClient(activity!!)
+
         binding.viewModel = _viewModel
 
         return binding.root
@@ -71,14 +73,13 @@ class SaveReminderFragment : BaseFragment() {
             val location = _viewModel.reminderSelectedLocationStr.value
             val latitude = _viewModel.latitude.value
             val longitude = _viewModel.longitude.value
-
-//            TODO: use the user entered reminder details to:
+//            Completed: use the user entered reminder details to:
 //             1) add a geofencing request
 //             2) save the reminder to the local db
             val reminder = ReminderDataItem(title, description, location, latitude, longitude)
+            _viewModel.validateAndSaveReminder(reminder)
 
             if (_viewModel.validateEnteredData(reminder)) {
-                _viewModel.validateAndSaveReminder(reminder)
                 addGeofence(reminder)
             }
         }
@@ -110,13 +111,19 @@ class SaveReminderFragment : BaseFragment() {
                 .addGeofence(geofence)
                 .build()
 
-        geofenceClient.addGeofences(geofencingRequest, geofencePendingIntent)?.run {
+        //First we remove any existing Geofences that uses PendingIntent
+        geofenceClient.removeGeofences(geofencePendingIntent)?.run {
+            //Add new geofence regardless of success/failure removal
             addOnCompleteListener {
-                Log.e("Add Geofence", geofence.requestId)
-            }
-            addOnFailureListener {
-                if (it.message != null) {
-                    Log.w(TAG, it.message!!)
+                geofenceClient.addGeofences(geofencingRequest, geofencePendingIntent)?.run {
+                    addOnCompleteListener {
+                        Log.e("Add Geofence", geofence.requestId)
+                    }
+                    addOnFailureListener {
+                        if (it.message != null) {
+                            Log.w(TAG, it.message!!)
+                        }
+                    }
                 }
             }
         }

@@ -24,34 +24,31 @@ class AuthenticationActivity : AppCompatActivity() {
     //We get a reference to the ViewModel scoped to this Fragment
     private val viewModel by viewModels<AuthenticationViewModel>()
 
-    companion object{
+    companion object {
         val TAG = AuthenticationActivity::class.java.simpleName
         const val SIGN_IN_RESULT_CODE = 1001
     }
+
     private lateinit var binding: ActivityAuthenticationBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_authentication)
 
-//          TODO: If the user was authenticated, send him to RemindersActivity
+//          If the user was authenticated, send him to RemindersActivity
 //        observeAuthenticationState()
 
         //Call launchSignInFlow when authenticationButton is pressed
         binding.authenticationButton.setOnClickListener {
             launchSignInFlow()
         }
-
-//          TODO: a bonus is to customize the sign in flow to look nice using :
-        //https://github.com/firebase/FirebaseUI-Android/blob/master/auth/README.md#custom-layout
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == SIGN_IN_RESULT_CODE){
+        if (requestCode == SIGN_IN_RESULT_CODE) {
             val response = IdpResponse.fromResultIntent(data)
-            if (resultCode == Activity.RESULT_OK){
+            if (resultCode == Activity.RESULT_OK) {
                 //User successfully logged in.
                 Log.i(TAG, "Successfully logged in ${FirebaseAuth.getInstance().currentUser?.displayName}")
                 observeAuthenticationState()
@@ -68,26 +65,24 @@ class AuthenticationActivity : AppCompatActivity() {
     /**
      * Observe the Authentication State and change the UI accordingly
      */
-    private fun observeAuthenticationState(){
+    private fun observeAuthenticationState() {
         //Use the Authentication used form the AuthenticationViewModel to update the UI
         viewModel.authenticationState.observe(this, Observer { authenticationState ->
-           if (authenticationState == AuthenticationViewModel.AuthenticationState.AUTHENTICATED)
-               startActivity(Intent(this, RemindersActivity::class.java))
+            if (authenticationState == AuthenticationViewModel.AuthenticationState.AUTHENTICATED)
+                startActivity(Intent(this, RemindersActivity::class.java))
             finish()
-
         })
-
     }
 
-    private fun launchSignInFlow(){
-    // Give users the option to sign in / register with their email or Google account.
-    // If users choose to register with their email, they will need to create a password as well.
+    private fun launchSignInFlow() {
+        // Give users the option to sign in / register with their email or Google account.
+        // If users choose to register with their email, they will need to create a password as well.
         val providers = arrayListOf(
                 AuthUI.IdpConfig.EmailBuilder().build(), AuthUI.IdpConfig.GoogleBuilder().build()
-    //Here we can provide more ways to Authenticate users like PhoneBuilder() or FaceBookBuilder()
+                //Here we can provide more ways to Authenticate users like PhoneBuilder() or FaceBookBuilder()
         )
-    //Create and Launch Sign-In Intent
-    //We listen to the Response with the SIGN_IN_RESULT_CODE
+        //Create and Launch Sign-In Intent
+        //We listen to the Response with the SIGN_IN_RESULT_CODE
         startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
@@ -95,6 +90,5 @@ class AuthenticationActivity : AppCompatActivity() {
                         .setAvailableProviders(providers).build(),
                 AuthenticationActivity.SIGN_IN_RESULT_CODE
         )
-
     }
 }

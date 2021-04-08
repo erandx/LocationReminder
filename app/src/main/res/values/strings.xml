@@ -31,6 +31,7 @@
     <string name="select_location">Please select location</string>
     <string name="geofences_not_added">Problem in adding geofences.</string>
     <string name="welcome">Welcome</string>
+    <string name="ok_back_button">Ok back Button</string>
     <string name="err_enter_title">Please enter title</string>
     <string name="err_select_location">Please select location</string>
 
@@ -41,4 +42,5 @@
     <string name="geofence_too_many_pending_intents">You have provided too many PendingIntents to the addGeofences() call.</string>
     <string name="error_adding_geofence">Error Happened, Can\'t Add Geofence</string>
     <string name="login_button">LOGIN</string>
+    <string name="geofence_transition_invalid_type">Geofence Transition Type Invalid</string>
 </resources>

@@ -8,6 +8,8 @@ import androidx.databinding.DataBindingUtil
 import com.udacity.project4.R
 import com.udacity.project4.databinding.ActivityReminderDescriptionBinding
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
+import com.udacity.project4.locationreminders.reminderslist.ReminderListFragment
+import kotlinx.android.synthetic.main.activity_reminder_description.*
 
 /**
  * Activity that displays the reminder details after the user clicks on the notification
@@ -32,6 +34,14 @@ class ReminderDescriptionActivity : AppCompatActivity() {
             this,
             R.layout.activity_reminder_description
         )
-//        TODO: Add the implementation of the reminder details
+        // Add the implementation of the reminder details
+        binding.reminderDataItem = intent.getSerializableExtra(EXTRA_ReminderDataItem) as ReminderDataItem
+
+        //Brings the User to the ReminderListFragment
+        ok__details_button.setOnClickListener {
+            val intent = Intent(this, ReminderListFragment::class.java)
+            startActivity(intent)
+        }
+
     }
 }
