@@ -30,10 +30,10 @@ class RemindersListViewModelTest {
     //Executes each task synchronously using Architecture Components into a repeatable order.
     //We should include this Rule every time we Test LiveDataa
     @get:Rule
-    val instantExecutorRule = InstantTaskExecutorRule()
+    var instantExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
-    val mainCoroutineRule = MainCoroutineRule()
+    var mainCoroutineRule = MainCoroutineRule()
 
     //Subject under Test
     private lateinit var viewModel : RemindersListViewModel
@@ -43,7 +43,6 @@ class RemindersListViewModelTest {
 
     @Before
     fun setupViewModel(){
-        stopKoin()
         //Initialize the fake Repository
         remindersRepository = FakeDataSource()
         viewModel = RemindersListViewModel(ApplicationProvider.getApplicationContext(), remindersRepository)

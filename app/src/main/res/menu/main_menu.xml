@@ -4,5 +4,11 @@
     <item
         android:id="@+id/logout"
         android:title="@string/logout"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/deleteAll"
+        android:title="@string/delete_reminders"
+        app:showAsAction="always"/>
+
 </menu>

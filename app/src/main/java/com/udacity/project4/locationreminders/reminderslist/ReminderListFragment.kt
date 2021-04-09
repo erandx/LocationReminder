@@ -84,6 +84,9 @@ class ReminderListFragment : BaseFragment() {
                            }
                 }
             }
+            R.id.deleteAll -> {
+                _viewModel.deleteReminders()
+            }
         }
         return super.onOptionsItemSelected(item)
     }

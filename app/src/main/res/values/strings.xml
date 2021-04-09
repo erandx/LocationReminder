@@ -43,4 +43,5 @@
     <string name="error_adding_geofence">Error Happened, Can\'t Add Geofence</string>
     <string name="login_button">LOGIN</string>
     <string name="geofence_transition_invalid_type">Geofence Transition Type Invalid</string>
+    <string name="delete_reminders">Delete Reminders</string>
 </resources>
