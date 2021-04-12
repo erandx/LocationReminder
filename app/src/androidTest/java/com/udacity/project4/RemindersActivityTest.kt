@@ -90,7 +90,7 @@ class RemindersActivityTest :
      * not scheduled in the Main Looper (ex when executed in a different Thread)
      */
     @Before
-    fun registerIdlingResource(){
+    fun registerIdlingResource() {
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
         IdlingRegistry.getInstance().register(databindingIdlingResource)
     }
@@ -101,11 +101,14 @@ class RemindersActivityTest :
         IdlingRegistry.getInstance().unregister(databindingIdlingResource)
     }
 
-        private val reminder = ReminderDTO("First Interview",
-                "Get ready to answer questions", "Googleplex", 37.4220656, -122.0840897)
-//    Completed: add End to End testing to the app .
+    private val reminder = ReminderDTO(
+        "First Interview",
+        "Get ready to answer questions", "Googleplex", 37.4220656, -122.0840897
+    )
+
+    //    Completed: add End to End testing to the app .
     @Test
-    fun addReminder() = runBlocking{
+    fun addReminder() = runBlocking {
         //Set initial State
 //        repository.saveReminder(ReminderDTO("First Interview", "Get ready to answer questions",
 //        "Boston", 42.3, 71.0))
@@ -118,7 +121,10 @@ class RemindersActivityTest :
         onView(withId(R.id.addReminderFAB)).perform(click())
         //Insert Details
         onView(withId(R.id.reminderTitle)).perform(typeText("First Interview"))
-        onView(withId(R.id.reminderDescription)).perform(typeText("Get ready to answer questions"), closeSoftKeyboard())
+        onView(withId(R.id.reminderDescription)).perform(
+            typeText("Get ready to answer questions"),
+            closeSoftKeyboard()
+        )
 
         //Click Map
         onView(withId(R.id.selectLocation)).perform(click())

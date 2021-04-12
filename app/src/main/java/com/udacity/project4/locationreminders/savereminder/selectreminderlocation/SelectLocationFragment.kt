@@ -49,13 +49,14 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
 
-    private val runningQorLater = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
+    private val runningQorLater =
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         binding =
-                DataBindingUtil.inflate(inflater, R.layout.fragment_select_location, container, false)
+            DataBindingUtil.inflate(inflater, R.layout.fragment_select_location, container, false)
 
         binding.viewModel = _viewModel
         binding.lifecycleOwner = this
@@ -96,7 +97,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     @SuppressLint("MissingPermission")
     private fun enableLocation() {
         if (foregroundAndBackgroundLocationPermissionApproved()) {
-            requestForegroundAndBackgroundPermissions()
             map.isMyLocationEnabled = true
             fusedLocationProviderClient.lastLocation.addOnSuccessListener(activity!!) { location ->
                 if (location != null) {
@@ -107,8 +107,10 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             }
         } else {
             _viewModel.showErrorMessage.postValue(getString(R.string.err_select_location))
-            ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    REQUEST_TURN_LOCATION_ON)
+            ActivityCompat.requestPermissions(
+                requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                REQUEST_TURN_LOCATION_ON
+            )
         }
     }
 
@@ -136,8 +138,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 
-        requestForegroundAndBackgroundPermissions()
-
         enableLocation()
 
         setPoiClick(map)
@@ -151,9 +151,9 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             binding.saveLocationButton.visibility = View.VISIBLE
 
             val poiMarket = map.addMarker(
-                    MarkerOptions().position(poi.latLng)
-                            .title(poi.name)
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
+                MarkerOptions().position(poi.latLng)
+                    .title(poi.name)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
             )
             val zoom = 16f
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(poi.latLng, zoom))
@@ -169,7 +169,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         try {
             //Customize the Base Map Style using a JSON object defined in the raw res file.
             val success = map.setMapStyle(
-                    MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style)
+                MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style)
             )
             if (!success) {
                 Log.e(TAG, "Style Parsing Failed.")
@@ -179,123 +179,63 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         }
     }
 
-    /*
-    * Determines if the App has the appropriate permission across Android Q and all other versions.
-     */
+    //    /*
+//    * Determines if the App has the appropriate permission across Android Q and all other versions.
+//     */
     @TargetApi(Build.VERSION_CODES.Q)
     private fun foregroundAndBackgroundLocationPermissionApproved(): Boolean {
         val foregroundLocationApproved = (
                 PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(
-                        requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
+                    requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
                 ))
         val backgroundLocationApproved =
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                    PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(
-                            requireContext(),
-                            Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                    )
-                } else {
-                    true
-                }
+            if (runningQorLater) {
+                PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                )
+            } else {
+                true
+            }
         return foregroundLocationApproved && backgroundLocationApproved
     }
 
-    /**
-     * Request ACCESS_FINE_LOCATION and on Android 10+ (Q) ACCESS_BACKGROUND_PERMISSION
-     */
-    @TargetApi(29)
-    private fun requestForegroundAndBackgroundPermissions() {
-        //Check if the permission have been already approved, if so we don't ask agan and return
-        if (foregroundAndBackgroundLocationPermissionApproved()) {
-            checkDeviceLocationSettings()
-            return
-        }
-        var permissionArray = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
-        val resultCode = when {
-            runningQorLater -> {
-                permissionArray += Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE
-            }
-            else -> REQUEST_FOREGROUND_ONLY_PERMISSION_REQUEST_CODE
-        }
-        Log.d(TAG, "Request Foreground only location permission")
-        ActivityCompat.requestPermissions(requireActivity(), permissionArray, resultCode)
-    }
-
-    //We check if the user has their Location Device Enabled, if not we ask to turn it ON
-    //using the Location request
-    @SuppressLint("MissingPermission")
-    private fun checkDeviceLocationSettings(resolve: Boolean = true) {
-        val locationRequest = LocationRequest.create().apply {
-            priority = LocationRequest.PRIORITY_LOW_POWER
-        }
-        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
-        //LocationServices to get the Settings Client and create a val
-        // called locationSettingsResponseTask to check the location settings
-        val settingsClient = LocationServices.getSettingsClient(requireActivity())
-        val locationSettingsResponseTask = settingsClient.checkLocationSettings(builder.build())
-        locationSettingsResponseTask.addOnFailureListener { exception ->
-            if (exception is ResolvableApiException && resolve) {
-                try {
-                    exception.startResolutionForResult(activity!!,
-                            REQUEST_TURN_LOCATION_ON)
-                } catch (sendEx: IntentSender.SendIntentException) {
-                    Log.d(TAG, "Error getting location Settings" + sendEx.message)
-                }
-            } else {
-                Snackbar.make(
-                        binding.mapLayout,
-                        R.string.location_required_error, Snackbar.LENGTH_INDEFINITE
-                ).setAction(android.R.string.ok) {
-                    checkDeviceLocationSettings()
-                }.show()
-            }
-        }
-    }
-
-    /**
-     * In all cases we need to have location permission. On Android 10+ Q we need
-     * background permission as well.
-     */
+    //     * In all cases we need to have location permission. On Android 10+ Q we need
+//     * background permission as well.
+//     */
     override fun onRequestPermissionsResult(
-            requestCode: Int,
-            permissions: Array<out String>,
-            grantResults: IntArray
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
     ) {
         Log.d(TAG, "onRequestPermissionResult")
         if (
-                grantResults.isEmpty() ||
-                grantResults[LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED ||
-                (requestCode == REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE &&
-                        grantResults[BACKGROUND_LOCATION_PERMISSION_INDEX] ==
-                        PackageManager.PERMISSION_DENIED)) {
+            grantResults.isEmpty() ||
+            grantResults[LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED ||
+            (requestCode == REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE &&
+                    grantResults[BACKGROUND_LOCATION_PERMISSION_INDEX] ==
+                    PackageManager.PERMISSION_DENIED)
+        ) {
             Snackbar.make(
-                    binding.mapLayout,
-                    R.string.permission_denied_explanation,
-                    Snackbar.LENGTH_LONG
+                binding.mapLayout,
+                R.string.permission_denied_explanation,
+                Snackbar.LENGTH_LONG
             )
-                    .setAction(R.string.settings) {
-                        startActivity(Intent().apply {
-                            action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                            data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        })
-                    }.show()
+                .setAction(R.string.settings) {
+                    startActivity(Intent().apply {
+                        action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                        data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    })
+                }.show()
         } else {
             enableLocation()
         }
-    }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == REQUEST_TURN_LOCATION_ON) {
-            checkDeviceLocationSettings(false)
-        }
     }
 }
 
 private const val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 33
-private const val REQUEST_FOREGROUND_ONLY_PERMISSION_REQUEST_CODE = 34
 private const val LOCATION_PERMISSION_INDEX = 0
 private const val BACKGROUND_LOCATION_PERMISSION_INDEX = 1
 private const val REQUEST_TURN_LOCATION_ON = 29

@@ -36,16 +36,17 @@ class RemindersListViewModelTest {
     var mainCoroutineRule = MainCoroutineRule()
 
     //Subject under Test
-    private lateinit var viewModel : RemindersListViewModel
+    private lateinit var viewModel: RemindersListViewModel
 
     //Fake Repository to be injected into the viewModel
     private lateinit var remindersRepository: FakeDataSource
 
     @Before
-    fun setupViewModel(){
+    fun setupViewModel() {
         //Initialize the fake Repository
         remindersRepository = FakeDataSource()
-        viewModel = RemindersListViewModel(ApplicationProvider.getApplicationContext(), remindersRepository)
+        viewModel =
+            RemindersListViewModel(ApplicationProvider.getApplicationContext(), remindersRepository)
     }
 
     @After
@@ -55,24 +56,24 @@ class RemindersListViewModelTest {
     }
 
     @Test
-    fun loadReminder_loadingReminders(){
+    fun loadReminder_loadingReminders() {
         //GIVEN - we are loading reminders
         mainCoroutineRule.pauseDispatcher()
         viewModel.loadReminders()
 
         //WHEN - the Dispatcher is paused, showLoading is true
-        assertThat(viewModel.showLoading.getOrAwaitValue(), `is` (true))
+        assertThat(viewModel.showLoading.getOrAwaitValue(), `is`(true))
         mainCoroutineRule.resumeDispatcher()
 
         //THAT - the Dispatcher is resumed, showLoading is false
-        assertThat(viewModel.showLoading.getOrAwaitValue(), `is` (false))
+        assertThat(viewModel.showLoading.getOrAwaitValue(), `is`(false))
 
     }
 
     @Test
-    fun loadReminders_deleteAllReminders(){
+    fun loadReminders_deleteAllReminders() {
         viewModel.deleteReminders()
-       val remindersRepository = viewModel.remindersList.getOrAwaitValue()
+        val remindersRepository = viewModel.remindersList.getOrAwaitValue()
 
         assertThat(remindersRepository, hasSize(0))
     }

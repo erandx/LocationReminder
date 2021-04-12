@@ -19,19 +19,18 @@ import com.udacity.project4.locationreminders.geofence.GeofenceTransitionsJobInt
 class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-    // implement the onReceive method to receive the geofencing events at the background
+        // implement the onReceive method to receive the geofencing events at the background
         enqueueWork(context, intent)
 
     }
 
     companion object {
         internal const val ACTION_GEOFENCE_EVENT = "com.udacity.project4.ACTION_GEOFENCE_EVENT"
-        const val GEO_FENCE_METERS_RADIUS = 100f
+        const val GEO_FENCE_METERS_RADIUS = 500f
 
         /** Used to set an Expiration time for geoFence. HOURS, DAYS etc. After this amount of time,
-         * Location Services stops tracking the geofence. We set it to expire in 2 hours.
+         * Location Services stops tracking the geofence. We set it to expire in 24 hours.
          */
-        val GEOFENCE_EXPIRATION_IN_MILLISECONDS: Long = TimeUnit.HOURS.toHours(3)
-
+        val GEOFENCE_EXPIRATION_IN_MILLISECONDS: Long = TimeUnit.HOURS.toHours(24)
     }
 }

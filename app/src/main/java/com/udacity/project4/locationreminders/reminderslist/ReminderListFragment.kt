@@ -39,6 +39,9 @@ class ReminderListFragment : BaseFragment() {
         return binding.root
     }
 
+    //Called immediately after onCreateView(LayoutInflater,ViewGroup,Bundle) has returned,
+    //This gives subclasses a change to initialize themselves once they know their view Hierarchy has
+    // been completely created.
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = this

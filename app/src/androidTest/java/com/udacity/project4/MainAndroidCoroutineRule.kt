@@ -10,8 +10,8 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
 @ExperimentalCoroutinesApi
-class MainAndroidCoroutineRule(val dispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()):
-TestWatcher(), TestCoroutineScope by TestCoroutineScope(dispatcher){
+class MainAndroidCoroutineRule(val dispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()) :
+    TestWatcher(), TestCoroutineScope by TestCoroutineScope(dispatcher) {
 
     override fun starting(description: Description?) {
         super.starting(description)

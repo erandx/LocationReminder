@@ -58,7 +58,7 @@ class RemindersListViewModel(
         showNoData.value = remindersList.value == null || remindersList.value!!.isEmpty()
     }
 
-    fun deleteReminders(){
+    fun deleteReminders() {
         viewModelScope.launch {
             dataSource.deleteAllReminders()
             remindersList.value = emptyList()

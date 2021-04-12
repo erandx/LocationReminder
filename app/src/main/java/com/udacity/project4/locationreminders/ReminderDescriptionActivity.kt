@@ -28,6 +28,7 @@ class ReminderDescriptionActivity : AppCompatActivity() {
     }
 
     private lateinit var binding: ActivityReminderDescriptionBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(
@@ -35,7 +36,8 @@ class ReminderDescriptionActivity : AppCompatActivity() {
             R.layout.activity_reminder_description
         )
         // Add the implementation of the reminder details
-        binding.reminderDataItem = intent.getSerializableExtra(EXTRA_ReminderDataItem) as ReminderDataItem
+        binding.reminderDataItem =
+            intent.getSerializableExtra(EXTRA_ReminderDataItem) as ReminderDataItem
 
         //Brings the User to the ReminderListFragment
         ok__details_button.setOnClickListener {

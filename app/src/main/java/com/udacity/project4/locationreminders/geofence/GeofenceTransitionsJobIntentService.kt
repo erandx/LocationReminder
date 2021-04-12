@@ -13,6 +13,8 @@ import com.udacity.project4.locationreminders.data.dto.Result
 import com.udacity.project4.locationreminders.data.local.RemindersLocalRepository
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 import com.udacity.project4.authentication.AuthenticationActivity.Companion.TAG
+import com.udacity.project4.locationreminders.data.ReminderDataSource
+import com.udacity.project4.locationreminders.data.local.RemindersDatabase
 import com.udacity.project4.utils.sendNotification
 import com.udacity.project4.locationreminders.geofence.GeofenceBroadcastReceiver.Companion.ACTION_GEOFENCE_EVENT
 import kotlinx.coroutines.*
@@ -75,9 +77,8 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
                 return
             }
         }
-
         //Get the local repository instance
-        val remindersLocalRepository: RemindersLocalRepository by inject()
+        val remindersLocalRepository: ReminderDataSource by inject()
 //        Interaction to the repository has to be through a coroutine scope
         CoroutineScope(coroutineContext).launch(SupervisorJob()) {
             //get the reminder with the request id
@@ -98,10 +99,11 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
             }
         }
     }
+
     // Returns the error String for a geofence error code.
-    fun errorMessage(context: Context, errorCode: Int): String{
+    fun errorMessage(context: Context, errorCode: Int): String {
         val resources = context.resources
-        return when(errorCode){
+        return when (errorCode) {
             GeofenceStatusCodes.GEOFENCE_NOT_AVAILABLE -> resources.getString(R.string.geofence_not_available)
             GeofenceStatusCodes.GEOFENCE_TOO_MANY_GEOFENCES -> resources.getString(R.string.geofence_too_many_geofences)
             GeofenceStatusCodes.GEOFENCE_TOO_MANY_PENDING_INTENTS -> resources.getString(R.string.geofence_too_many_pending_intents)
