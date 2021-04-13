@@ -50,18 +50,19 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
             //In case that there is an error, you will want to understand what went wrong
             if (geofencinEvent.hasError()) {
                 val errorMessage = errorMessage(this, geofencinEvent.errorCode)
-                Log.i(TAG, errorMessage)
+                Log.i(GEO, errorMessage)
                 return
             }
             val geofenceTransition = geofencinEvent.geofenceTransition
 
             if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
-                Log.v(TAG, getString(R.string.geofence_entered))
+                Log.v(GEO, getString(R.string.geofence_entered))
 
                 val enterGeofence = geofencinEvent.triggeringGeofences
+                //Sent a notification to the User when entered Geofence area.
                 sendNotification(enterGeofence)
             } else {
-                Log.v(TAG, getString(R.string.geofence_transition_invalid_type))
+                Log.v(GEO, getString(R.string.geofence_transition_invalid_type))
             }
         }
     }
@@ -73,7 +74,7 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
             triggeringGeofences.isNotEmpty() ->
                 triggeringGeofences[0].requestId
             else -> {
-                Log.e(TAG, "No Geofence trigger found.")
+                Log.e(GEO, "No Geofence trigger found.")
                 return
             }
         }
@@ -96,6 +97,7 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
                         reminderDTO.id
                     )
                 )
+                Log.e(GEO, "Notification sent")
             }
         }
     }
@@ -111,3 +113,4 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
         }
     }
 }
+private const val GEO = "Geofence Receiver"

@@ -10,6 +10,7 @@ import com.udacity.project4.authentication.AuthenticationActivity
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentRemindersBinding
+import com.udacity.project4.locationreminders.ReminderDescriptionActivity
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import com.udacity.project4.utils.setTitle
 import com.udacity.project4.utils.setup
@@ -67,7 +68,12 @@ class ReminderListFragment : BaseFragment() {
     }
 
     private fun setupRecyclerView() {
-        val adapter = RemindersListAdapter {
+        val adapter = RemindersListAdapter { reminder ->
+            startActivity(
+                    Intent(requireContext(), ReminderDescriptionActivity::class.java).apply {
+                        putExtra(EXTRA_ReminderDataItem, reminder)
+                    }
+            )
         }
 //        setup the recycler view using the extension function
         binding.reminderssRecyclerView.setup(adapter)
@@ -79,12 +85,12 @@ class ReminderListFragment : BaseFragment() {
                 //Logout Intent. Will redirect the user to the Login Screen.
                 context?.let {
                     AuthUI.getInstance().signOut(it)
-                           .addOnCompleteListener {
+                            .addOnCompleteListener {
                                 val intent = Intent(activity, AuthenticationActivity::class.java)
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                                 startActivity(intent)
-                           }
+                            }
                 }
             }
             R.id.deleteAll -> {
@@ -101,3 +107,5 @@ class ReminderListFragment : BaseFragment() {
     }
 
 }
+
+private const val EXTRA_ReminderDataItem = "EXTRA_ReminderDataItem"

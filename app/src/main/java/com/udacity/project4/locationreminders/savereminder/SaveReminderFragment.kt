@@ -64,7 +64,9 @@ class SaveReminderFragment : BaseFragment() {
 
         geofenceClient = LocationServices.getGeofencingClient(activity!!)
 
-        checkPermissionsAndStartGeofence()
+       requestForegroundAndBackgroundPermissions()
+
+        checkDeviceLocationSettings(true)
 
         binding.viewModel = _viewModel
 
@@ -97,14 +99,6 @@ class SaveReminderFragment : BaseFragment() {
         }
     }
 
-    private fun checkPermissionsAndStartGeofence() {
-        if (foregroundAndBackgroundLocationPermissionApproved()) {
-            checkDeviceLocationSettings()
-        } else {
-            requestForegroundAndBackgroundPermissions()
-        }
-    }
-
     @SuppressLint("MissingPermission")
     private fun addGeofence(reminder: ReminderDataItem) {
         //Build the Geofence Object
@@ -114,8 +108,9 @@ class SaveReminderFragment : BaseFragment() {
             //Set the Circular Region of this Geofence
             .setCircularRegion(reminder.latitude!!, reminder.longitude!!, GEO_FENCE_METERS_RADIUS)
             //Set the Expiration Duration of this Geofence. Automatically removed after a period of time
-            // if we want to never Expire we use Geofence.NEVER_EXPIRE
-            .setExpirationDuration(GEOFENCE_EXPIRATION_IN_MILLISECONDS)
+            // if we want to never Expire we use Geofence.NEVER_EXPIRE or
+            // GEOFENCE_EXPIRATION_IN_MILLISECONDS to custom it
+            .setExpirationDuration(Geofence.NEVER_EXPIRE)
             // Alerts are only generated for this transition. We can track Entry, Dwell, Exit.
             .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
             .build()
@@ -141,6 +136,7 @@ class SaveReminderFragment : BaseFragment() {
                         Log.e("Add Geofence", geofence.requestId)
                     }
                     addOnFailureListener {
+                        Log.i(TAG, "Geofence not added")
                         if (it.message != null) {
                             Log.w(TAG, it.message!!)
                         }
@@ -184,7 +180,6 @@ class SaveReminderFragment : BaseFragment() {
     private fun requestForegroundAndBackgroundPermissions() {
         //Check if the permission have been already approved, if so we don't ask again and return
         if (foregroundAndBackgroundLocationPermissionApproved()) {
-            checkDeviceLocationSettings()
             return
         }
         var permissionArray = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)

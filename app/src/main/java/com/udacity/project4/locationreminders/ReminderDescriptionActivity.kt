@@ -36,13 +36,16 @@ class ReminderDescriptionActivity : AppCompatActivity() {
             R.layout.activity_reminder_description
         )
         // Add the implementation of the reminder details
-        binding.reminderDataItem =
-            intent.getSerializableExtra(EXTRA_ReminderDataItem) as ReminderDataItem
+        if (intent.hasExtra(EXTRA_ReminderDataItem)) {
+            binding.reminderDataItem =
+                    intent.getSerializableExtra(EXTRA_ReminderDataItem) as ReminderDataItem
+            binding.executePendingBindings()
+        }
+
 
         //Brings the User to the ReminderListFragment
         ok__details_button.setOnClickListener {
-            val intent = Intent(this, ReminderListFragment::class.java)
-            startActivity(intent)
+            onBackPressed()
         }
 
     }

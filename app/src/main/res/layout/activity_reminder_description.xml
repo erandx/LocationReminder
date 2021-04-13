@@ -27,7 +27,7 @@
             android:paddingTop="@dimen/padding_large"
             android:text="@{reminderDataItem.title}"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="@dimen/text_size_large"
+            android:textSize="@dimen/text_size_xlarge"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
