@@ -232,7 +232,6 @@ class SaveReminderFragment : BaseFragment() {
             }
         }
     }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == REQUEST_TURN_LOCATION_ON) {
