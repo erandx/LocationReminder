@@ -43,49 +43,58 @@ class SaveReminderViewModelTest {
     //Fake Repository to be injected into the ViewModel
     private lateinit var remindersRepository: FakeDataSource
 
-//Completed: provide testing to the SaveReminderView and its live data objects
+    //Completed: provide testing to the SaveReminderView and its live data objects
     @Before
-    fun setupViewModel(){
-    //Initialize the Repository
-    remindersRepository = FakeDataSource()
-     viewModel = SaveReminderViewModel(ApplicationProvider.getApplicationContext(), remindersRepository)
+    fun setupViewModel() {
+        //Initialize the Repository
+        remindersRepository = FakeDataSource()
+        viewModel =
+            SaveReminderViewModel(ApplicationProvider.getApplicationContext(), remindersRepository)
     }
 
     @After
-    fun cleanUpData() = runBlocking{
+    fun cleanUpData() = runBlocking {
         remindersRepository.deleteAllReminders()
         stopKoin()
     }
 
     @Test
-    fun returnError() = mainCoroutineRule.runBlockingTest{
-        val reminder = ReminderDataItem("","Description", "Florida",
-                0.0, 0.0)
+    fun returnError() = mainCoroutineRule.runBlockingTest {
+        val reminder = ReminderDataItem(
+            "", "Description", "Florida",
+            0.0, 0.0
+        )
         val dataItem = viewModel.validateEnteredData(reminder)
         assertThat(dataItem, `is`(false))
         assertThat(viewModel.showSnackBarInt.getOrAwaitValue(), `is`(R.string.err_enter_title))
     }
 
     @Test
-    fun onClear_nullValue(){
+    fun onClear_nullValue() {
         viewModel.onClear()
-        assertThat(viewModel.reminderTitle.getOrAwaitValue(), `is` (nullValue()))
-        assertThat(viewModel.reminderDescription.getOrAwaitValue(), `is` (nullValue()))
+        assertThat(viewModel.reminderTitle.getOrAwaitValue(), `is`(nullValue()))
+        assertThat(viewModel.reminderDescription.getOrAwaitValue(), `is`(nullValue()))
         assertThat(viewModel.reminderSelectedLocationStr.getOrAwaitValue(), `is`(nullValue()))
     }
 
     @Test
-    fun check_loading() = mainCoroutineRule.runBlockingTest{
+    fun check_loading() = mainCoroutineRule.runBlockingTest {
         //Given a new Reminder and a fresh ViewModel
-        val reminder = ReminderDataItem("Title","Description", "Florida",
-                27.3, -92.8)
+        val reminder = ReminderDataItem(
+            "Title", "Description", "Florida",
+            27.3, -92.8
+        )
         remindersRepository = FakeDataSource()
-        viewModel = SaveReminderViewModel(ApplicationProvider.getApplicationContext(), remindersRepository)
+        viewModel =
+            SaveReminderViewModel(ApplicationProvider.getApplicationContext(), remindersRepository)
         mainCoroutineRule.pauseDispatcher()
         //When validating a saving the Reminder
         viewModel.validateAndSaveReminder(reminder)
         //Than is loading
         assertThat(viewModel.showLoading.getOrAwaitValue(), `is`(true))
+        mainCoroutineRule.resumeDispatcher()
+        //Gets hidden
+        assertThat(viewModel.showLoading.getOrAwaitValue(), `is`(false))
     }
 
 }
